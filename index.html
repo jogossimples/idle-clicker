@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyber Miner 2026</title>
     <style>
-        /* Ajustado para permitir rolagem se a loja crescer muito */
         body { 
             background: #0a0a0a; 
             color: #00ff41; 
@@ -42,7 +41,7 @@
             border-radius: 5px; 
             transition: 0.1s; 
             width: 100%;
-            white-space: pre; /* Necessário para manter o formato do boneco ASCII */
+            white-space: pre; 
             line-height: 1.2;
         }
 
@@ -68,6 +67,7 @@
             width: 100%; 
             text-align: left; 
             margin: 0; 
+            transition: 0.2s;
         }
 
         button.upgrade:disabled { 
@@ -75,12 +75,27 @@
             border-color: #444; 
             cursor: not-allowed; 
         }
+
+        .error-flash {
+            border-color: #ff0000 !important;
+            color: #ff0000 !important;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
     </style>
 </head>
 <body>
 
     <div id="game-box">
         <div class="stat">Dados: <span id="score">0</span></div>
+        <div style="font-size: 14px; margin-bottom: 5px;">Cliques: <span id="click-count">0</span></div>
         <div style="color: #888">DPS: <span id="dps">0</span></div>
         
         <button id="click-btn">
@@ -103,8 +118,8 @@
         let data = Number(localStorage.getItem('data')) || 0;
         let dps = Number(localStorage.getItem('dps')) || 0;
         let perClick = Number(localStorage.getItem('perClick')) || 1;
+        let totalClicks = Number(localStorage.getItem('totalClicks')) || 0;
 
-        // Armazena os custos atuais para que eles aumentem progressivamente
         let costs = JSON.parse(localStorage.getItem('costs')) || {
             up1: 10,
             up2: 50,
@@ -112,18 +127,18 @@
         };
 
         const scoreEl = document.getElementById('score');
+        const clickEl = document.getElementById('click-count');
         const dpsEl = document.getElementById('dps');
 
         function update() {
             scoreEl.innerText = Math.floor(data);
+            clickEl.innerText = totalClicks;
             dpsEl.innerText = dps;
             
-            // Atualiza os valores de custo na tela
             document.getElementById('cost-up1').innerText = Math.floor(costs.up1);
             document.getElementById('cost-up2').innerText = Math.floor(costs.up2);
             document.getElementById('cost-up3').innerText = Math.floor(costs.up3);
 
-            // Verifica se o jogador tem saldo para cada upgrade
             document.getElementById('up1').disabled = data < costs.up1;
             document.getElementById('up2').disabled = data < costs.up2; 
             document.getElementById('up3').disabled = data < costs.up3;
@@ -133,26 +148,24 @@
 
         document.getElementById('click-btn').onclick = () => {
             data += perClick;
+            totalClicks += 1;
             update();
         };
 
-        // Função buy ajustada para lidar com custos dinâmicos
-        function buy(upgradeId, bonus, type) {
-            let currentCost = costs[upgradeId];
+        function buy(id, bonus, type) {
+            let currentCost = costs[id];
+            let btn = document.getElementById(id);
             
             if (data >= currentCost) {
                 data -= currentCost;
+                if (type === 'c') perClick += bonus;
+                else dps += bonus;
                 
-                if (type === 'c') {
-                    perClick += bonus;
-                } else {
-                    dps += bonus;
-                }
-
-                // Aumenta o custo em 50% para a próxima compra
-                costs[upgradeId] = Math.ceil(currentCost * 1.5);
-                
+                costs[id] = Math.ceil(currentCost * 1.5);
                 update();
+            } else {
+                btn.classList.add('error-flash');
+                setTimeout(() => btn.classList.remove('error-flash'), 300);
             }
         }
 
@@ -160,6 +173,7 @@
             localStorage.setItem('data', data);
             localStorage.setItem('dps', dps);
             localStorage.setItem('perClick', perClick);
+            localStorage.setItem('totalClicks', totalClicks);
             localStorage.setItem('costs', JSON.stringify(costs));
         }
 
