@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyber Miner 2026</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <style>
         body { 
             background: #0a0a0a; 
@@ -54,7 +57,7 @@
             border-top: 1px solid #333; 
             padding-top: 20px; 
             display: flex;
-            flex-direction: column;
+            flex-direction: column; 
             gap: 10px;
         }
 
@@ -111,10 +114,29 @@
             <button class="upgrade" id="up3" onclick="buy('up3', 10, 'a')">IA Avançada (+10/s) - Custo: <span id="cost-up3">500</span></button>
         </div>
 
+        <div class="shop" style="border-top: 1px solid #00ff41;">
+            <p style="margin: 10px 0;">RANKING GLOBAL</p>
+            <input type="text" id="playerName" placeholder="Apelido..." style="background:#222; color:#00ff41; border:1px solid #00ff41; padding:5px; width:90%; margin-bottom:5px;">
+            <button class="upgrade" onclick="registrarNoRanking()">Registrar Recorde</button>
+            <ul id="rankingList" style="list-style:none; padding:0; font-size:12px; color:#aaa; margin-top:10px;"><li>Carregando...</li></ul>
+        </div>
+
         <button onclick="reset()" style="margin-top:30px; background:none; border:none; color:#444; cursor:pointer; font-size: 12px;">Resetar Progresso</button>
     </div>
 
     <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCH2EmnM_n2_whLGQaTx3bMRfvSLjp2YeA",
+            authDomain: "idle-clicker-hacker.firebaseapp.com",
+            projectId: "idle-clicker-hacker",
+            storageBucket: "idle-clicker-hacker.firebasestorage.app",
+            messagingSenderId: "367062112995",
+            appId: "1:367062112995:web:b88185dad749a3f76403d6"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         let data = Number(localStorage.getItem('data')) || 0;
         let dps = Number(localStorage.getItem('dps')) || 0;
         let perClick = Number(localStorage.getItem('perClick')) || 1;
@@ -144,6 +166,25 @@
             document.getElementById('up3').disabled = data < costs.up3;
             
             save();
+        }
+
+        // Funções do Ranking
+        function registrarNoRanking() {
+            let nome = document.getElementById('playerName').value || "Hacker";
+            db.ref('rankings/').push({ nome: nome, score: Math.floor(data) });
+            alert("Recorde registrado!");
+        }
+
+        function carregarRanking() {
+            db.ref('rankings/').orderByChild('score').limitToLast(5).once('value', (snapshot) => {
+                let list = document.getElementById('rankingList');
+                list.innerHTML = "";
+                let items = [];
+                snapshot.forEach(child => items.push(child.val()));
+                items.sort((a, b) => b.score - a.score).forEach((item, i) => {
+                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${item.score}</li>`;
+                });
+            });
         }
 
         document.getElementById('click-btn').onclick = () => {
@@ -188,6 +229,10 @@
             data += dps / 10;
             update();
         }, 100);
+
+        // Atualização do Ranking a cada 1 minuto (60.000ms)
+        setInterval(carregarRanking, 60000);
+        carregarRanking();
 
         update();
     </script>
