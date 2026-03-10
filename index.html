@@ -3,297 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Miner 2026 - Ultimate</title>
+    <title>Cyber Miner 2026</title>
     <style>
-        :root {
-            --neon-green: #00ff41;
-            --dark-bg: #0a0a0a;
-            --panel-bg: #1a1a1a;
-        }
-
-        body {
-            background-color: var(--dark-bg);
-            color: var(--neon-green);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            user-select: none;
-        }
-
-        .header {
-            text-align: center;
+        /* Ajustado para permitir rolagem se a loja crescer muito */
+        body { 
+            background: #0a0a0a; 
+            color: #00ff41; 
+            font-family: monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; 
+            min-height: 100vh; 
+            margin: 0; 
             padding: 20px;
-            width: 100%;
-            background: #000;
-            border-bottom: 2px solid var(--neon-green);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
         }
-
-        .main-container {
-            display: flex;
+        
+        #game-box { 
+            border: 2px solid #00ff41; 
+            padding: 30px; 
+            border-radius: 10px; 
+            text-align: center; 
+            box-shadow: 0 0 20px #00ff4133; 
+            background: #111; 
             width: 90%;
-            max-width: 1000px;
-            gap: 20px;
-            margin-top: 20px;
+            max-width: 400px;
         }
 
-        /* Área do Clique */
-        .click-section {
-            flex: 1;
+        #click-btn { 
+            background: #00ff41; 
+            color: #000; 
+            border: none; 
+            padding: 20px 40px; 
+            font-size: 20px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin: 20px 0; /* Margem ajustada para o novo layout */
+            border-radius: 5px; 
+            transition: 0.1s; 
+            width: 100%;
+        }
+
+        #click-btn:active { transform: scale(0.95); }
+        
+        .stat { font-size: 24px; margin-bottom: 10px; }
+        
+        /* A loja agora empilha os itens verticalmente abaixo do botão */
+        .shop { 
+            margin-top: 10px; 
+            border-top: 1px solid #333; 
+            padding-top: 20px; 
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: var(--panel-bg);
-            padding: 40px;
-            border-radius: 15px;
-            border: 1px solid #333;
+            gap: 10px;
         }
 
-        #big-button {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 5px solid var(--neon-green);
-            background: transparent;
-            color: var(--neon-green);
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.1s;
-            box-shadow: 0 0 15px var(--neon-green);
-            outline: none;
+        button.upgrade { 
+            background: #222; 
+            color: #00ff41; 
+            border: 1px solid #00ff41; 
+            padding: 12px; 
+            cursor: pointer; 
+            width: 100%; 
+            text-align: left; 
+            margin: 0; /* Reset de margem para usar o gap do flex */
         }
 
-        #big-button:active {
-            transform: scale(0.9);
-            background: rgba(0, 255, 65, 0.1);
-        }
-
-        /* Área da Loja */
-        .shop-section {
-            flex: 1;
-            background: var(--panel-bg);
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid #333;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .upgrade-card {
-            background: #252525;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            border-left: 5px solid #555;
-            transition: 0.3s;
-        }
-
-        .upgrade-card:hover {
-            border-left-color: var(--neon-green);
-            background: #333;
-        }
-
-        .upgrade-card.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .prestige-btn {
-            background: #ff0055;
-            color: white;
-            border: none;
-            padding: 10px;
-            width: 100%;
-            margin-top: 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        /* Notificações flutuantes */
-        .floating-text {
-            position: absolute;
-            color: white;
-            pointer-events: none;
-            animation: moveUp 1s forwards;
-            font-weight: bold;
-        }
-
-        @keyframes moveUp {
-            from { transform: translateY(0); opacity: 1; }
-            to { transform: translateY(-100px); opacity: 0; }
+        button.upgrade:disabled { 
+            color: #444; 
+            border-color: #444; 
+            cursor: not-allowed; 
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>DATA MINER v2.0</h1>
-        <div>Dados: <b id="score">0</b> | DPS: <span id="dps-display">0</span></div>
-        <div id="prestige-info" style="font-size: 0.8rem; color: #aaa;">Multiplicador de Prestígio: x<span id="mult-display">1</span></div>
-    </div>
+    <div id="game-box">
+        <div class="stat">Dados: <span id="score">0</span></div>
+        <div style="color: #888">DPS: <span id="dps">0</span></div>
+        
+        <button id="click-btn">MINERAR DADOS</button>
 
-    <div class="main-container">
-        <div class="click-section">
-            <button id="big-button">MINERAR</button>
-            <p style="margin-top: 20px;">Clique por clique: <span id="click-power-display">1</span></p>
+        <div class="shop">
+            <button class="upgrade" id="up1" onclick="buy(10, 1, 'c')">Upgrade CPU (+1 clique) - Custo: 10</button>
+            <button class="upgrade" id="up2" onclick="buy(50, 1, 'a')">Script Auto (+1/s) - Custo: 50</button>
+            <button class="upgrade" id="up3" onclick="buy(500, 10, 'a')">IA Avançada (+10/s) - Custo: 500</button>
         </div>
 
-        <div class="shop-section">
-            <h3>Upgrades de Hardware</h3>
-            <div id="upgrades-list">
-                </div>
-            
-            <hr style="border: 0.5px solid #333; margin: 20px 0;">
-            <h3>Especial</h3>
-            <button class="prestige-btn" onclick="prestige()">
-                REINICIAR SISTEMA (Prestígio)<br>
-                <small>Ganha +10% de bônus por cada 1M de dados</small>
-            </button>
-            <button onclick="resetGame()" style="margin-top: 10px; background: none; border: none; color: #555; cursor: pointer; width: 100%;">Apagar todo o progresso</button>
-        </div>
+        <button onclick="reset()" style="margin-top:30px; background:none; border:none; color:#444; cursor:pointer; font-size: 12px;">Resetar Progresso</button>
     </div>
 
     <script>
-        // --- ESTADO DO JOGO ---
-        let game = {
-            data: 0,
-            totalDataHistory: 0,
-            clickPower: 1,
-            prestigeMultiplier: 1,
-            upgrades: [
-                { id: 0, name: "Mouse Gamer", cost: 15, bonus: 1, type: "click", count: 0 },
-                { id: 1, name: "Script Python", cost: 100, bonus: 5, type: "auto", count: 0 },
-                { id: 2, name: "Servidor Proxy", cost: 1100, bonus: 30, type: "auto", count: 0 },
-                { id: 3, name: "Farm de IAs", cost: 12000, bonus: 150, type: "auto", count: 0 }
-            ]
+        let data = Number(localStorage.getItem('data')) || 0;
+        let dps = Number(localStorage.getItem('dps')) || 0;
+        let perClick = Number(localStorage.getItem('perClick')) || 1;
+
+        const scoreEl = document.getElementById('score');
+        const dpsEl = document.getElementById('dps');
+
+        function update() {
+            scoreEl.innerText = Math.floor(data);
+            dpsEl.innerText = dps;
+            // Mantida sua lógica original de verificação de custo
+            document.getElementById('up1').disabled = data < (10 * Math.pow(1.5, perClick-1));
+            document.getElementById('up2').disabled = data < 50; 
+            document.getElementById('up3').disabled = data < 500;
+            save();
+        }
+
+        document.getElementById('click-btn').onclick = () => {
+            data += perClick;
+            update();
         };
 
-        // --- LÓGICA CORE ---
-        const btn = document.getElementById('big-button');
-
-        btn.addEventListener('click', (e) => {
-            let gain = game.clickPower * game.prestigeMultiplier;
-            game.data += gain;
-            game.totalDataHistory += gain;
-            spawnText(e.pageX, e.pageY, `+${gain.toFixed(1)}`);
-            updateUI();
-        });
-
-        function updateUI() {
-            document.getElementById('score').innerText = Math.floor(game.data).toLocaleString();
-            document.getElementById('click-power-display').innerText = (game.clickPower * game.prestigeMultiplier).toFixed(1);
-            document.getElementById('mult-display').innerText = game.prestigeMultiplier.toFixed(1);
-            
-            // Calcular DPS
-            let dps = game.upgrades
-                .filter(u => u.type === 'auto')
-                .reduce((sum, u) => sum + (u.bonus * u.count), 0);
-            document.getElementById('dps-display').innerText = (dps * game.prestigeMultiplier).toFixed(1);
-
-            renderShop();
-        }
-
-        function renderShop() {
-            const list = document.getElementById('upgrades-list');
-            list.innerHTML = '';
-            game.upgrades.forEach(upg => {
-                const canAfford = game.data >= upg.cost;
-                const div = document.createElement('div');
-                div.className = `upgrade-card ${canAfford ? '' : 'disabled'}`;
-                div.onclick = () => buyUpgrade(upg.id);
-                div.innerHTML = `
-                    <strong>${upg.name} (Qtd: ${upg.count})</strong><br>
-                    Custo: ${Math.floor(upg.cost)} | +${upg.bonus} ${upg.type === 'click' ? '/clique' : '/seg'}
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function buyUpgrade(id) {
-            let upg = game.upgrades.find(u => u.id === id);
-            if (game.data >= upg.cost) {
-                game.data -= upg.cost;
-                upg.count++;
-                if (upg.type === 'click') game.clickPower += upg.bonus;
-                upg.cost *= 1.15; // Aumento de 15% no preço
-                updateUI();
-                saveGame();
+        function buy(baseCost, bonus, type) {
+            if (data >= baseCost) {
+                data -= baseCost;
+                if (type === 'c') perClick += bonus;
+                else dps += bonus;
+                update();
             }
         }
 
-        // --- SISTEMAS AVANÇADOS ---
-
-        function spawnText(x, y, text) {
-            const el = document.createElement('div');
-            el.className = 'floating-text';
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            el.innerText = text;
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1000);
+        function save() {
+            localStorage.setItem('data', data);
+            localStorage.setItem('dps', dps);
+            localStorage.setItem('perClick', perClick);
         }
 
-        function prestige() {
-            let bonusEarned = Math.floor(game.totalDataHistory / 1000000) * 0.1;
-            if (bonusEarned > 0) {
-                if(confirm(`Reiniciar agora dará +${(bonusEarned * 100).toFixed(0)}% de bônus permanente. Confirmar?`)) {
-                    game.prestigeMultiplier += bonusEarned;
-                    game.data = 0;
-                    game.totalDataHistory = 0;
-                    game.clickPower = 1;
-                    game.upgrades.forEach(u => {
-                        u.count = 0;
-                        // Reseta custos originais (exemplo simples)
-                        u.cost = u.id === 0 ? 15 : u.id === 1 ? 100 : u.id === 2 ? 1100 : 12000;
-                    });
-                    updateUI();
-                    saveGame();
-                }
-            } else {
-                alert("Você precisa de pelo menos 1.000.000 de dados totais para o prestígio!");
-            }
-        }
-
-        // --- SAVE / LOAD ---
-        function saveGame() {
-            localStorage.setItem('cyberMinerSave', JSON.stringify(game));
-        }
-
-        function loadGame() {
-            const saved = localStorage.getItem('cyberMinerSave');
-            if (saved) {
-                game = JSON.parse(saved);
-                updateUI();
-            }
-        }
-
-        function resetGame() {
-            if(confirm("Tem certeza? Isso apagará TUDO.")) {
+        function reset() {
+            if(confirm("Deseja mesmo resetar?")) {
                 localStorage.clear();
                 location.reload();
             }
         }
 
-        // Loop Automático
         setInterval(() => {
-            let dps = game.upgrades
-                .filter(u => u.type === 'auto')
-                .reduce((sum, u) => sum + (u.bonus * u.count), 0);
-            game.data += (dps * game.prestigeMultiplier) / 10; // Roda a 100ms
-            updateUI();
+            data += dps / 10;
+            update();
         }, 100);
 
-        // Auto-save a cada 30 segundos
-        setInterval(saveGame, 30000);
-
-        loadGame();
-        updateUI();
+        update();
     </script>
 </body>
-  </html>
+</html>
