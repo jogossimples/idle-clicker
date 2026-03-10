@@ -140,7 +140,6 @@
         let perClick = Number(localStorage.getItem('perClick')) || 1;
         let totalClicks = Number(localStorage.getItem('totalClicks')) || 0;
 
-        // Configuração do nome padrão
         let defaultName = "Henriquepgd";
         let savedName = localStorage.getItem('playerName') || defaultName;
         document.getElementById('playerName').value = savedName;
@@ -178,7 +177,12 @@
 
         function syncData() {
             let nome = localStorage.getItem('playerName') || "Hacker";
-            db.ref('rankings/').push({ nome: nome, score: Math.floor(data) });
+            // Adicionado envio do totalClicks ao banco
+            db.ref('rankings/').push({ 
+                nome: nome, 
+                score: Math.floor(data),
+                totalClicks: totalClicks 
+            });
             carregarRanking();
         }
 
@@ -189,7 +193,8 @@
                 let items = [];
                 snapshot.forEach(child => items.push(child.val()));
                 items.sort((a, b) => b.score - a.score).forEach((item, i) => {
-                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${item.score}</li>`;
+                    // Exibindo Pontuação e Total de Cliques
+                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${item.score} pts | ${item.totalClicks || 0} cliques</li>`;
                 });
             });
         }
