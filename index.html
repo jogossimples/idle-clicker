@@ -139,6 +139,7 @@
         let dps = Number(localStorage.getItem('dps')) || 0;
         let perClick = Number(localStorage.getItem('perClick')) || 1;
         let totalClicks = Number(localStorage.getItem('totalClicks')) || 0;
+        let totalDadosAcumulados = Number(localStorage.getItem('totalDadosAcumulados')) || 0;
 
         let defaultName = "Henriquepgd";
         let savedName = localStorage.getItem('playerName') || defaultName;
@@ -177,11 +178,11 @@
 
         function syncData() {
             let nome = localStorage.getItem('playerName') || "Hacker";
-            // Adicionado envio do totalClicks ao banco
             db.ref('rankings/').push({ 
                 nome: nome, 
                 score: Math.floor(data),
-                totalClicks: totalClicks 
+                totalDados: Math.floor(totalDadosAcumulados),
+                totalCliques: totalClicks 
             });
             carregarRanking();
         }
@@ -193,8 +194,7 @@
                 let items = [];
                 snapshot.forEach(child => items.push(child.val()));
                 items.sort((a, b) => b.score - a.score).forEach((item, i) => {
-                    // Exibindo Pontuação e Total de Cliques
-                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${item.score} pts | ${item.totalClicks || 0} cliques</li>`;
+                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${item.totalDados || 0} total | ${item.totalCliques || 0} clicks</li>`;
                 });
             });
         }
@@ -202,6 +202,7 @@
         document.getElementById('click-btn').onclick = () => {
             data += perClick;
             totalClicks += 1;
+            totalDadosAcumulados += perClick;
             update();
         };
 
@@ -227,6 +228,7 @@
             localStorage.setItem('dps', dps);
             localStorage.setItem('perClick', perClick);
             localStorage.setItem('totalClicks', totalClicks);
+            localStorage.setItem('totalDadosAcumulados', totalDadosAcumulados);
             localStorage.setItem('costs', JSON.stringify(costs));
         }
 
@@ -239,6 +241,7 @@
 
         setInterval(() => {
             data += dps / 10;
+            totalDadosAcumulados += dps / 10;
             update();
         }, 100);
 
