@@ -34,21 +34,22 @@
             background: #00ff41; 
             color: #000; 
             border: none; 
-            padding: 20px 40px; 
-            font-size: 20px; 
+            padding: 15px; 
+            font-size: 16px; 
             font-weight: bold; 
             cursor: pointer; 
-            margin: 20px 0; /* Margem ajustada para o novo layout */
+            margin: 20px 0; 
             border-radius: 5px; 
             transition: 0.1s; 
             width: 100%;
+            white-space: pre; /* Necessário para manter o formato do boneco ASCII */
+            line-height: 1.2;
         }
 
         #click-btn:active { transform: scale(0.95); }
         
         .stat { font-size: 24px; margin-bottom: 10px; }
         
-        /* A loja agora empilha os itens verticalmente abaixo do botão */
         .shop { 
             margin-top: 10px; 
             border-top: 1px solid #333; 
@@ -66,7 +67,7 @@
             cursor: pointer; 
             width: 100%; 
             text-align: left; 
-            margin: 0; /* Reset de margem para usar o gap do flex */
+            margin: 0; 
         }
 
         button.upgrade:disabled { 
@@ -82,7 +83,12 @@
         <div class="stat">Dados: <span id="score">0</span></div>
         <div style="color: #888">DPS: <span id="dps">0</span></div>
         
-        <button id="click-btn">MINERAR DADOS</button>
+        <button id="click-btn">
+    (⌐■_■)
+   <|  █  |>
+    /   \
+ [ MINERAR ]
+        </button>
 
         <div class="shop">
             <button class="upgrade" id="up1" onclick="buy(10, 1, 'c')">Upgrade CPU (+1 clique) - Custo: 10</button>
@@ -104,7 +110,6 @@
         function update() {
             scoreEl.innerText = Math.floor(data);
             dpsEl.innerText = dps;
-            // Mantida sua lógica original de verificação de custo
             document.getElementById('up1').disabled = data < (10 * Math.pow(1.5, perClick-1));
             document.getElementById('up2').disabled = data < 50; 
             document.getElementById('up3').disabled = data < 500;
