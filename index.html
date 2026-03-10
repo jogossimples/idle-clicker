@@ -140,8 +140,11 @@
         let perClick = Number(localStorage.getItem('perClick')) || 1;
         let totalClicks = Number(localStorage.getItem('totalClicks')) || 0;
 
-        // Carrega nome salvo
-        document.getElementById('playerName').value = localStorage.getItem('playerName') || "";
+        // Configuração do nome padrão
+        let defaultName = "Henriquepgd";
+        let savedName = localStorage.getItem('playerName') || defaultName;
+        document.getElementById('playerName').value = savedName;
+        if(!localStorage.getItem('playerName')) localStorage.setItem('playerName', defaultName);
 
         let costs = JSON.parse(localStorage.getItem('costs')) || {
             up1: 10,
