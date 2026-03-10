@@ -91,9 +91,9 @@
         </button>
 
         <div class="shop">
-            <button class="upgrade" id="up1" onclick="buy(10, 1, 'c')">Upgrade CPU (+1 clique) - Custo: 10</button>
-            <button class="upgrade" id="up2" onclick="buy(50, 1, 'a')">Script Auto (+1/s) - Custo: 50</button>
-            <button class="upgrade" id="up3" onclick="buy(500, 10, 'a')">IA Avançada (+10/s) - Custo: 500</button>
+            <button class="upgrade" id="up1" onclick="buy('up1', 1, 'c')">Upgrade CPU (+1 clique) - Custo: <span id="cost-up1">10</span></button>
+            <button class="upgrade" id="up2" onclick="buy('up2', 1, 'a')">Script Auto (+1/s) - Custo: <span id="cost-up2">50</span></button>
+            <button class="upgrade" id="up3" onclick="buy('up3', 10, 'a')">IA Avançada (+10/s) - Custo: <span id="cost-up3">500</span></button>
         </div>
 
         <button onclick="reset()" style="margin-top:30px; background:none; border:none; color:#444; cursor:pointer; font-size: 12px;">Resetar Progresso</button>
@@ -104,15 +104,30 @@
         let dps = Number(localStorage.getItem('dps')) || 0;
         let perClick = Number(localStorage.getItem('perClick')) || 1;
 
+        // Armazena os custos atuais para que eles aumentem progressivamente
+        let costs = JSON.parse(localStorage.getItem('costs')) || {
+            up1: 10,
+            up2: 50,
+            up3: 500
+        };
+
         const scoreEl = document.getElementById('score');
         const dpsEl = document.getElementById('dps');
 
         function update() {
             scoreEl.innerText = Math.floor(data);
             dpsEl.innerText = dps;
-            document.getElementById('up1').disabled = data < (10 * Math.pow(1.5, perClick-1));
-            document.getElementById('up2').disabled = data < 50; 
-            document.getElementById('up3').disabled = data < 500;
+            
+            // Atualiza os valores de custo na tela
+            document.getElementById('cost-up1').innerText = Math.floor(costs.up1);
+            document.getElementById('cost-up2').innerText = Math.floor(costs.up2);
+            document.getElementById('cost-up3').innerText = Math.floor(costs.up3);
+
+            // Verifica se o jogador tem saldo para cada upgrade
+            document.getElementById('up1').disabled = data < costs.up1;
+            document.getElementById('up2').disabled = data < costs.up2; 
+            document.getElementById('up3').disabled = data < costs.up3;
+            
             save();
         }
 
@@ -121,11 +136,22 @@
             update();
         };
 
-        function buy(baseCost, bonus, type) {
-            if (data >= baseCost) {
-                data -= baseCost;
-                if (type === 'c') perClick += bonus;
-                else dps += bonus;
+        // Função buy ajustada para lidar com custos dinâmicos
+        function buy(upgradeId, bonus, type) {
+            let currentCost = costs[upgradeId];
+            
+            if (data >= currentCost) {
+                data -= currentCost;
+                
+                if (type === 'c') {
+                    perClick += bonus;
+                } else {
+                    dps += bonus;
+                }
+
+                // Aumenta o custo em 50% para a próxima compra
+                costs[upgradeId] = Math.ceil(currentCost * 1.5);
+                
                 update();
             }
         }
@@ -134,6 +160,7 @@
             localStorage.setItem('data', data);
             localStorage.setItem('dps', dps);
             localStorage.setItem('perClick', perClick);
+            localStorage.setItem('costs', JSON.stringify(costs));
         }
 
         function reset() {
