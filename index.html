@@ -116,8 +116,7 @@
 
         <div class="shop" style="border-top: 1px solid #00ff41;">
             <p style="margin: 10px 0;">RANKING GLOBAL</p>
-            <input type="text" id="playerName" placeholder="Apelido..." style="background:#222; color:#00ff41; border:1px solid #00ff41; padding:5px; width:90%; margin-bottom:5px;">
-            <button class="upgrade" onclick="registrarNoRanking()">Registrar Recorde</button>
+            <input type="text" id="playerName" placeholder="Apelido..." oninput="saveName()" style="background:#222; color:#00ff41; border:1px solid #00ff41; padding:5px; width:90%; margin-bottom:5px;">
             <ul id="rankingList" style="list-style:none; padding:0; font-size:12px; color:#aaa; margin-top:10px;"><li>Carregando...</li></ul>
         </div>
 
@@ -125,7 +124,6 @@
     </div>
 
     <script>
-        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCH2EmnM_n2_whLGQaTx3bMRfvSLjp2YeA",
             authDomain: "idle-clicker-hacker.firebaseapp.com",
@@ -142,6 +140,9 @@
         let perClick = Number(localStorage.getItem('perClick')) || 1;
         let totalClicks = Number(localStorage.getItem('totalClicks')) || 0;
 
+        // Carrega nome salvo
+        document.getElementById('playerName').value = localStorage.getItem('playerName') || "";
+
         let costs = JSON.parse(localStorage.getItem('costs')) || {
             up1: 10,
             up2: 50,
@@ -151,6 +152,10 @@
         const scoreEl = document.getElementById('score');
         const clickEl = document.getElementById('click-count');
         const dpsEl = document.getElementById('dps');
+
+        function saveName() {
+            localStorage.setItem('playerName', document.getElementById('playerName').value);
+        }
 
         function update() {
             scoreEl.innerText = Math.floor(data);
@@ -168,11 +173,10 @@
             save();
         }
 
-        // Funções do Ranking
-        function registrarNoRanking() {
-            let nome = document.getElementById('playerName').value || "Hacker";
+        function syncData() {
+            let nome = localStorage.getItem('playerName') || "Hacker";
             db.ref('rankings/').push({ nome: nome, score: Math.floor(data) });
-            alert("Recorde registrado!");
+            carregarRanking();
         }
 
         function carregarRanking() {
@@ -230,8 +234,7 @@
             update();
         }, 100);
 
-        // Atualização do Ranking a cada 1 minuto (60.000ms)
-        setInterval(carregarRanking, 60000);
+        setInterval(syncData, 60000);
         carregarRanking();
 
         update();
