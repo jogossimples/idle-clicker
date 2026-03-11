@@ -141,6 +141,13 @@
         let totalClicks = Number(localStorage.getItem('totalClicks')) || 0;
         let totalDadosAcumulados = Number(localStorage.getItem('totalDadosAcumulados')) || 0;
 
+        // Gerar ID único persistente para o jogador
+        let playerID = localStorage.getItem('playerID');
+        if (!playerID) {
+            playerID = 'player_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('playerID', playerID);
+        }
+
         let defaultName = "Henriquepgd";
         let savedName = localStorage.getItem('playerName') || defaultName;
         document.getElementById('playerName').value = savedName;
@@ -178,9 +185,8 @@
 
         function syncData() {
             let nome = localStorage.getItem('playerName') || "Hacker";
-            // Otimizado: usando set() com o nome do jogador como ID para evitar duplicatas
-            let playerRef = nome.replace(/[^a-z0-9]/gi, '_'); 
-            db.ref('rankings/' + playerRef).set({ 
+            // Usa o playerID fixo para salvar, garantindo exclusividade
+            db.ref('rankings/' + playerID).set({ 
                 nome: nome, 
                 score: Math.floor(data),
                 totalDados: Math.floor(totalDadosAcumulados),
