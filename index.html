@@ -206,7 +206,8 @@
                 });
 
                 items.sort((a, b) => b.score - a.score).forEach((item, i) => {
-                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${Math.floor(item.totalDados || 0)}</li>`;
+                    let medalha = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i+1}º`;
+                    list.innerHTML += `<li>${medalha} ${item.nome}: ${Math.floor(item.totalDados || 0)} dados</li>`;
                 });
             });
         }
