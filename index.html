@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyber Miner 2026</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5263437063771609" crossorigin="anonymous"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
@@ -126,11 +124,6 @@
                 <button onclick="addDados(10000)">Ganhar 10k Dados</button>
             </div>
 
-            <div id="skinSystem" style="margin-top:15px; border-top:1px solid #333; padding-top:10px;">
-                <button class="upgrade" onclick="girarSkins()">Loja de Skins (20k Dados)</button>
-                <div id="inventario" style="margin-top:10px; font-size:11px; color:#fff;"></div>
-            </div>
-
             <ul id="rankingList" style="list-style:none; padding:0; font-size:12px; color:#aaa; margin-top:10px;"><li>Carregando...</li></ul>
         </div>
 
@@ -154,9 +147,6 @@
         let perClick = Number(localStorage.getItem('perClick')) || 1;
         let totalClicks = Number(localStorage.getItem('totalClicks')) || 0;
         let totalDadosAcumulados = Number(localStorage.getItem('totalDadosAcumulados')) || 0;
-        let inventory = JSON.parse(localStorage.getItem('inventory')) || ["(⌐■_■)"];
-        let currentSkin = localStorage.getItem('currentSkin') || "(⌐■_■)";
-        let skinMult = Number(localStorage.getItem('skinMult')) || 1;
 
         let playerID = localStorage.getItem('playerID');
         if (!playerID) {
@@ -164,6 +154,7 @@
             localStorage.setItem('playerID', playerID);
         }
 
+        // --- Configuração Admin ---
         const ADMIN_ID = "player_i3tk5kf4l"; 
         if (playerID === ADMIN_ID) {
             document.getElementById('adminPanel').style.display = 'block';
@@ -174,26 +165,32 @@
             totalDadosAcumulados += valor;
             update();
         }
+        // --------------------------
 
         let defaultName = "Henriquepgd";
         let savedName = localStorage.getItem('playerName') || defaultName;
         document.getElementById('playerName').value = savedName;
         if(!localStorage.getItem('playerName')) localStorage.setItem('playerName', defaultName);
 
-        let costs = JSON.parse(localStorage.getItem('costs')) || { up1: 10, up2: 50, up3: 500 };
+        let costs = JSON.parse(localStorage.getItem('costs')) || {
+            up1: 10,
+            up2: 50,
+            up3: 500
+        };
 
         const scoreEl = document.getElementById('score');
         const clickEl = document.getElementById('click-count');
         const dpsEl = document.getElementById('dps');
         document.getElementById('displayID').innerText = "ID: " + playerID;
 
-        function saveName() { localStorage.setItem('playerName', document.getElementById('playerName').value); }
+        function saveName() {
+            localStorage.setItem('playerName', document.getElementById('playerName').value);
+        }
 
         function update() {
             scoreEl.innerText = Math.floor(data);
             clickEl.innerText = totalClicks;
             dpsEl.innerText = dps;
-            document.getElementById('click-btn').innerText = currentSkin + "\n[ MINERAR ]";
             
             document.getElementById('cost-up1').innerText = Math.floor(costs.up1);
             document.getElementById('cost-up2').innerText = Math.floor(costs.up2);
@@ -203,38 +200,17 @@
             document.getElementById('up2').disabled = data < costs.up2; 
             document.getElementById('up3').disabled = data < costs.up3;
             
-            atualizarInventario();
             save();
-        }
-
-        function girarSkins() {
-            if (data < 20000) return alert("Precisa de 20k dados!");
-            data -= 20000;
-            let rand = Math.random() * 100;
-            let novaSkin, mult;
-            if (rand < 5) { novaSkin = "(👑_👑)"; mult = 16; }
-            else if (rand < 35) { novaSkin = "(🔥_🔥)"; mult = 8; }
-            else if (rand < 85) { novaSkin = "(😎_😎)"; mult = 4; }
-            else { novaSkin = "(😐_😐)"; mult = 2; }
-            if (!inventory.includes(novaSkin)) inventory.push(novaSkin);
-            alert("Você tirou: " + novaSkin);
-            update();
-        }
-
-        function equipar(skin, mult) { currentSkin = skin; skinMult = mult; update(); }
-
-        function atualizarInventario() {
-            let div = document.getElementById('inventario');
-            div.innerHTML = "Skins:";
-            inventory.forEach(s => {
-                let m = s === "(👑_👑)" ? 16 : s === "(🔥_🔥)" ? 8 : s === "(😎_😎)" ? 4 : 2;
-                div.innerHTML += `<button onclick="equipar('${s}', ${m})">${s}</button>`;
-            });
         }
 
         function syncData() {
             let nome = localStorage.getItem('playerName') || "Hacker";
-            db.ref('rankings/' + playerID).set({ nome: nome, score: Math.floor(data), totalDados: Math.floor(totalDadosAcumulados), totalCliques: totalClicks });
+            db.ref('rankings/' + playerID).set({ 
+                nome: nome, 
+                score: Math.floor(data),
+                totalDados: Math.floor(totalDadosAcumulados),
+                totalCliques: totalClicks 
+            });
             carregarRanking();
         }
 
@@ -243,7 +219,11 @@
                 let list = document.getElementById('rankingList');
                 list.innerHTML = "";
                 let items = [];
-                snapshot.forEach(c => items.push(c.val()));
+                
+                snapshot.forEach(childSnapshot => {
+                    items.push(childSnapshot.val());
+                });
+
                 items.sort((a, b) => b.score - a.score).forEach((item, i) => {
                     let medalha = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i+1}º`;
                     list.innerHTML += `<li>${medalha} ${item.nome}: ${Math.floor(item.totalDados || 0)} dados</li>`;
@@ -252,18 +232,21 @@
         }
 
         document.getElementById('click-btn').onclick = () => {
-            data += (perClick * skinMult);
+            data += perClick;
             totalClicks += 1;
-            totalDadosAcumulados += (perClick * skinMult);
+            totalDadosAcumulados += perClick;
             update();
         };
 
         function buy(id, bonus, type) {
             let currentCost = costs[id];
             let btn = document.getElementById(id);
+            
             if (data >= currentCost) {
                 data -= currentCost;
-                if (type === 'c') perClick += bonus; else dps += bonus;
+                if (type === 'c') perClick += bonus;
+                else dps += bonus;
+                
                 costs[id] = Math.ceil(currentCost * 1.5);
                 update();
             } else {
@@ -273,17 +256,30 @@
         }
 
         function save() {
-            localStorage.setItem('data', data); localStorage.setItem('dps', dps); localStorage.setItem('perClick', perClick);
-            localStorage.setItem('totalClicks', totalClicks); localStorage.setItem('totalDadosAcumulados', totalDadosAcumulados);
-            localStorage.setItem('costs', JSON.stringify(costs)); localStorage.setItem('inventory', JSON.stringify(inventory));
-            localStorage.setItem('currentSkin', currentSkin); localStorage.setItem('skinMult', skinMult);
+            localStorage.setItem('data', data);
+            localStorage.setItem('dps', dps);
+            localStorage.setItem('perClick', perClick);
+            localStorage.setItem('totalClicks', totalClicks);
+            localStorage.setItem('totalDadosAcumulados', totalDadosAcumulados);
+            localStorage.setItem('costs', JSON.stringify(costs));
         }
 
-        function reset() { if(confirm("Deseja mesmo resetar?")) { localStorage.clear(); location.reload(); } }
+        function reset() {
+            if(confirm("Deseja mesmo resetar?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
 
-        setInterval(() => { data += (dps / 10); totalDadosAcumulados += (dps / 10); update(); }, 100);
+        setInterval(() => {
+            data += dps / 10;
+            totalDadosAcumulados += dps / 10;
+            update();
+        }, 100);
+
         setInterval(syncData, 60000);
         carregarRanking();
+
         update();
     </script>
 </body>
