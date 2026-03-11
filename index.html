@@ -141,7 +141,6 @@
         let totalClicks = Number(localStorage.getItem('totalClicks')) || 0;
         let totalDadosAcumulados = Number(localStorage.getItem('totalDadosAcumulados')) || 0;
 
-        // Gerar ID único persistente para o jogador
         let playerID = localStorage.getItem('playerID');
         if (!playerID) {
             playerID = 'player_' + Math.random().toString(36).substr(2, 9);
@@ -185,7 +184,6 @@
 
         function syncData() {
             let nome = localStorage.getItem('playerName') || "Hacker";
-            // Usa o playerID fixo para salvar, garantindo exclusividade
             db.ref('rankings/' + playerID).set({ 
                 nome: nome, 
                 score: Math.floor(data),
@@ -200,9 +198,13 @@
                 let list = document.getElementById('rankingList');
                 list.innerHTML = "";
                 let items = [];
-                snapshot.forEach(child => items.push(child.val()));
+                
+                snapshot.forEach(childSnapshot => {
+                    items.push(childSnapshot.val());
+                });
+
                 items.sort((a, b) => b.score - a.score).forEach((item, i) => {
-                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${item.totalDados || 0} total | ${item.totalCliques || 0} clicks</li>`;
+                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${Math.floor(item.totalDados || 0)} total | ${item.totalCliques || 0} clicks</li>`;
                 });
             });
         }
