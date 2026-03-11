@@ -162,7 +162,7 @@
         const scoreEl = document.getElementById('score');
         const clickEl = document.getElementById('click-count');
         const dpsEl = document.getElementById('dps');
-        document.getElementById('displayID').innerText = "ID: " + playerID; // Exibe o ID na tela
+        document.getElementById('displayID').innerText = "ID: " + playerID;
 
         function saveName() {
             localStorage.setItem('playerName', document.getElementById('playerName').value);
@@ -206,7 +206,7 @@
                 });
 
                 items.sort((a, b) => b.score - a.score).forEach((item, i) => {
-                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${Math.floor(item.totalDados || 0)} total | ${item.totalCliques || 0} clicks</li>`;
+                    list.innerHTML += `<li>${i+1}º ${item.nome}: ${Math.floor(item.totalDados || 0)}</li>`;
                 });
             });
         }
