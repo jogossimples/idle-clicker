@@ -178,7 +178,9 @@
 
         function syncData() {
             let nome = localStorage.getItem('playerName') || "Hacker";
-            db.ref('rankings/').push({ 
+            // Otimizado: usando set() com o nome do jogador como ID para evitar duplicatas
+            let playerRef = nome.replace(/[^a-z0-9]/gi, '_'); 
+            db.ref('rankings/' + playerRef).set({ 
                 nome: nome, 
                 score: Math.floor(data),
                 totalDados: Math.floor(totalDadosAcumulados),
