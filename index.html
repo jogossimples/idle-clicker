@@ -118,6 +118,12 @@
             <p style="margin: 10px 0;">RANKING GLOBAL</p>
             <input type="text" id="playerName" placeholder="Apelido..." oninput="saveName()" style="background:#222; color:#00ff41; border:1px solid #00ff41; padding:5px; width:90%; margin-bottom:5px;">
             <div id="displayID" style="font-size: 9px; color: #444; margin-bottom: 10px;">ID: Carregando...</div>
+            
+            <div id="adminPanel" style="display:none; margin-top:10px; padding:10px; border:1px solid #ff0000; color:#ff0000;">
+                <p>PAINEL ADMIN</p>
+                <button onclick="addDados(10000)">Ganhar 10k Dados</button>
+            </div>
+
             <ul id="rankingList" style="list-style:none; padding:0; font-size:12px; color:#aaa; margin-top:10px;"><li>Carregando...</li></ul>
         </div>
 
@@ -147,6 +153,19 @@
             playerID = 'player_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('playerID', playerID);
         }
+
+        // --- Configuração Admin ---
+        const ADMIN_ID = "player_i3tk5kf4l"; 
+        if (playerID === ADMIN_ID) {
+            document.getElementById('adminPanel').style.display = 'block';
+        }
+
+        function addDados(valor) {
+            data += valor;
+            totalDadosAcumulados += valor;
+            update();
+        }
+        // --------------------------
 
         let defaultName = "Henriquepgd";
         let savedName = localStorage.getItem('playerName') || defaultName;
